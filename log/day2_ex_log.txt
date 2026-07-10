@@ -1,0 +1,8 @@
+Decorators wrap functions:
+
+```python
+@timer
+def f(): ...
+```
+
+equals `f = timer(f)`.

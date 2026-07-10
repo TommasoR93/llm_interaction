@@ -1,0 +1,14 @@
+#virtual environment
+.venv
+
+#Environment variables
+.env
+
+#UV
+.python-version
+
+#Roadmap
+roadmap.md
+
+#cache
+*pycache*
