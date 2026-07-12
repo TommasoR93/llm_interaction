@@ -105,6 +105,11 @@ Add basic summarization of old messages
 -- this list is describing the basic architecture of a conversational AI system with memory management.
 A chat model is stateless. It does not remember previous API calls automatically.
 You need to maintain the conversation history yourself.
+So you need to append the user input therefore Now the history contains the context. Then Every message you keep increases the input size for tokens consumptions because every call sends the entire context. You can't send unlimited history because 
+models have context limits
+cost increases
+latency increases
+so you can implement message trimming meaning to Keep only the last N messages and you can also add basic summarization of old messages.
 
  # Day 7 — Mini Project #1
 💬 “CLI AI Assistant”
