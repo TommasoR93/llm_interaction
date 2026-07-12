@@ -1,0 +1,8 @@
+{
+  "city": "Wroclaw è una città antica nel sud-ovest della Polonia, di nuovo polacca da quasi 80 anni.",
+  "history": "Nei secoli è stata parte di Polonia, Germania e Ungheria; distrutta durante la seconda guerra mondiale.",
+  "weather": "Inverni freddi ed estati calde.",
+  "places": "Rynek, Hala Stulecia, Sky Tower e zone sul fiume Odra.",
+  "university": "Molte università, soprattutto quella tecnologica, attirano studenti internazionali.",
+  "night_life": "Beach bar lungo l’Odra con buona atmosfera."
+}

@@ -1,2 +1,2 @@
 # llm_interaction
-llm_interaction repo for practice
+Repo to practice LLM interaction with OpenAI.
