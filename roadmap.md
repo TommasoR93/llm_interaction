@@ -34,10 +34,6 @@ Force JSON output from model
 Define fixed output structure
 Test consistency across prompts
 Save outputs to variables (not just print)
-# Day 5 — Parsing & Validation
-Parse JSON response in code
-Add error handling (try/except)
-Handle invalid outputs
 
 Note:
 If you're using Pydantic with Structured Outputs, then client.responses.parse() is the recommended method.
@@ -49,3 +45,71 @@ return a Pydantic object.
 Then to convert a Pydantic object/model to JSON, use .model_dump_json() in Pydantic v2.
 Then to convert a Pydantic object/model to Python dict, use .model_dump in Pydantic v2.
 Also the LLM is deciding what content goes inside each field. Pydantic is not generating the values — it is only defining the structure and validating the output.
+
+# Day 5 — Parsing & Validation
+Parse JSON response in code
+Add error handling (try/except)
+Handle invalid outputs
+
+Note The best practice is to use the SDK exceptions as your primary error-handling mechanism, not manually check HTTP status codes.
+
+from openai import (
+    APIError,
+    AuthenticationError,
+    RateLimitError,
+    BadRequestError,
+    APITimeoutError,
+)
+
+except AuthenticationError:
+    # API key problem (401)
+    print("Check your API key")
+
+except RateLimitError:
+    # Too many requests (429)
+    print("Slow down or retry later")
+
+except BadRequestError:
+    # Invalid request (400)
+    print("Fix the request parameters")
+
+except APITimeoutError:
+    # Network timeout
+    print("Request timed out")
+
+except APIError as e:
+    # Catch-all OpenAI API errors
+    print(f"OpenAI API error: {e}")
+
+In general:
+2. You can handle different errors differently
+
+A production application usually treats errors differently:
+
+Error	            Action
+AuthenticationError	Stop, fix configuration
+BadRequestError	    Log and fix code/input
+RateLimitError	    Retry with backoff
+APITimeoutError	    Retry
+APIConnectionError	Retry
+InternalServerError	Retry
+APIError	        Log unexpected failures
+
+# Day 6 — Context & Memory
+Build chat history list
+Send full message history to API
+Observe token growth
+Implement message trimming
+Add basic summarization of old messages
+
+-- this list is describing the basic architecture of a conversational AI system with memory management.
+A chat model is stateless. It does not remember previous API calls automatically.
+You need to maintain the conversation history yourself.
+
+ # Day 7 — Mini Project #1
+💬 “CLI AI Assistant”
+Chat interface in terminal
+Maintains conversation memory
+Uses system prompt personality
+Outputs structured response option
+Handles basic errors
