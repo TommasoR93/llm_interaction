@@ -109,7 +109,42 @@ So you need to append the user input therefore Now the history contains the cont
 models have context limits
 cost increases
 latency increases
-so you can implement message trimming meaning to Keep only the last N messages and you can also add basic summarization of old messages.
+so you can implement message trimming meaning to Keep only the last N messages and you can also add basic summarization of old messages. Note that Trimming removes information Instead of deleting old messages, summarize them.
+
+Note here: 
+Every model has a context window. Companies don't keep every message forever, Instead they periodically summarize. 
+The summary is another API call and you need to use another prompt i.e. summary_system.md rather than conversation_system.md.
+Example of a very modular architecture:
+instructions/
+    conversation.md
+    summary.md
+Then:
+chat.py
+    response = conversation()
+memory.py
+
+    summary = summarize()
+logger.py
+    save_json()
+
+When do you summarize? There are no fixed rules however a good example is:
+if token_count(messages) > 50000:
+    summarize()
+
+What OpenAI recommends (general architecture):
+Developer Prompt
+        │
+        ▼
+Conversation History
+        │
+        ▼
+Running Summary
+        │
+        ▼
+Latest 5-10 exchanges
+        │
+        ▼
+Current User Message
 
  # Day 7 — Mini Project #1
 💬 “CLI AI Assistant”
@@ -118,3 +153,66 @@ Maintains conversation memory
 Uses system prompt personality
 Outputs structured response option
 Handles basic errors
+
+# Retry limit logic with tenacity
+from openai import OpenAI
+from tenacity import (
+    retry,
+    stop_after_attempt,
+    wait_random_exponential,
+    retry_if_exception_type,
+    before_sleep_log,
+)
+import openai
+import logging
+
+client = OpenAI()
+logger = logging.getLogger(__name__)
+
+@retry(
+    stop=stop_after_attempt(5),
+    wait=wait_random_exponential(
+        multiplier=1,
+        max=60
+    ),
+    retry=retry_if_exception_type(
+        (
+            openai.RateLimitError,
+            openai.APITimeoutError,
+            openai.APIConnectionError,
+        )
+    ),
+    before_sleep=before_sleep_log(logger, logging.WARNING),
+    reraise=True,
+)
+def generate_response(prompt: str):
+    response = client.responses.create(
+        model="gpt-5-mini",
+        input=prompt,
+        timeout=30,
+    )
+    return response.output_text
+
+ This configuration is close to what you typically see in production:
+5 attempts
+random exponential backoff
+60s max wait
+retry only transient OpenAI failures
+log retries
+raise the real error after exhaustion
+
+Tenacity parameter / Example value / Purpose
+
+stop / stop_after_attempt(5) / Defines the maximum number of attempts before giving up. Here: 5 total attempts (initial request + retries).
+
+wait / wait_random_exponential(multiplier=1, max=60) / Controls the delay between retries using exponential backoff with randomness. The wait time increases after each failure while adding jitter to avoid multiple clients retrying at the same time.
+
+max (inside wait_random_exponential) / 60 seconds / Caps the maximum retry wait time. Even if the exponential delay grows, Tenacity will never wait more than 60 seconds between attempts.
+
+multiplier (inside wait_random_exponential) / 1 / Controls the base scale of the exponential delay. A higher value increases the initial and subsequent wait durations.
+
+retry / retry_if_exception_type(...) / Defines which failures should trigger a retry. In the OpenAI example, only transient errors are retried (RateLimitError, APITimeoutError, APIConnectionError).
+
+before_sleep / before_sleep_log(logger, logging.WARNING) / Logs information before each retry, including the exception and the next retry delay. Useful for monitoring and debugging.
+
+reraise / True / After all retry attempts fail, raises the original OpenAI exception instead of wrapping it inside a Tenacity RetryError.

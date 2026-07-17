@@ -74,7 +74,6 @@ response = client.responses.create(
     input=messages
 )
 
-
 assistant_answer = response.output_text
 
 

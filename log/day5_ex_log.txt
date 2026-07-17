@@ -1,8 +1,0 @@
-{
-  "city": "Wrocław to stare miasto w południowo-zachodniej Polsce, od prawie 80 lat znów w Polsce.",
-  "history": "Przez wieki należał do Polski, Niemiec i Węgier; został zniszczony podczas II wojny światowej.",
-  "weather": "Zimne zimy i ciepłe lata.",
-  "places": "Rynek, Hala Stulecia, Sky Tower, miejsca nad Odrą.",
-  "university": "Kilka uniwersytetów, ważna uczelnia techniczna przyciąga studentów z całego świata.",
-  "night_life": "Beach bary nad Odrą z dobrą atmosferą."
-}
