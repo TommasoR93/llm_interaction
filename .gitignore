@@ -9,3 +9,6 @@
 
 #cache
 *pycache*
+
+#fastapi
+fastapi_doc.md
